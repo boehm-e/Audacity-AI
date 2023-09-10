@@ -48,7 +48,7 @@ if questions.get("model"):
     pa.mute_tracks()
 
     commands = ["/home/erwan/anaconda3/envs/ai_perso/bin/python",
-    "/home/erwan/Desktop/ai/RVC-GUI/cli.py",
+    "./rvc/cli.py",
     "--input_audio",
     f"{path}/vocals.mp3",
     "--speaker_id",
