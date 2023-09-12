@@ -1,9 +1,7 @@
 import json
-import subprocess
 import pyaudacity as pa
 import uuid
 import os
-import demucs.separate
 import utils
 
 # python = "/home/erwan/anaconda3/envs/ai_perso/bin/python"
@@ -30,70 +28,66 @@ def get_track_by_name(name):
             return str(i)
     return False
 
-# def get_track_by_index(idx):
-#     tracks = get_tracks()
-#     return tracks[idx].get("name")
-#     for i, track in enumerate(tracks):
-#         if track.get("name") == name:
-#             return str(i)
-#     return False
-
 def select_track(track):
     pa.do(f"Select: Track={track}")
 
+id = str(uuid.uuid4())[:5]
 
-
-
-id = str(uuid.uuid4())
-id_short = id[:5]
-os.mkdir(id)
-filename = os.path.join(os.getcwd(), id, f"{id}.mp3")
+utils.mkdir(os.path.join(utils.TEMP_FOLDER, id))
+filename = os.path.join(utils.TEMP_FOLDER, id, f"{id}.mp3")
 
 # export the selected part to mp3
 pa.export(filename)
 
+print("EXPORT", filename)
+
+
 if questions.get("separate") is True:
     # separate vocals from song using demucs
-    demucs.separate.main(["--mp3", "--out", id, filename])
+    utils.separate_tracks(filename, id)
 
-
-    path = os.path.join(os.getcwd(), id, 'htdemucs', id)
+    separated_song_folder = os.path.join(utils.TEMP_FOLDER, id)
     # importe voice
-    voice_label = f"voix-{id_short}"
-    import_audio(os.path.join(path, "vocals.mp3"), voice_label)
+    voice_label = f"voix-{id}"
+    import_audio(os.path.join(separated_song_folder, "vocals.wav"), voice_label)
     pa.do("Align_StartToSelStart:")
 
     # import other
-    other_label = f"autres-{id_short}"
-    import_audio(os.path.join(path, "other.mp3"), other_label)
+    other_label = f"autres-{id}"
+    import_audio(os.path.join(separated_song_folder, "other.wav"), other_label)
     pa.do("Align_StartToSelStart:")
 
     # import drums
-    drums_label = f"batterie-{id_short}"
-    import_audio(os.path.join(path, "drums.mp3"), drums_label)
+    drums_label = f"batterie-{id}"
+    import_audio(os.path.join(separated_song_folder, "drums.wav"), drums_label)
     pa.do("Align_StartToSelStart:")
 
     # import bass
-    bass_label = f"bass-{id_short}"
-    import_audio(os.path.join(path, "bass.mp3"), bass_label)
+    bass_label = f"bass-{id}"
+    import_audio(os.path.join(separated_song_folder, "bass.wav"), bass_label)
     pa.do("Align_StartToSelStart:")
+
+    # remove files after import
+    # os.remove(os.path.join(separated_song_folder, "vocals.wav"))
+    # os.remove(os.path.join(separated_song_folder, "other.wav"))
+    # os.remove(os.path.join(separated_song_folder, "drums.wav"))
+    # os.remove(os.path.join(separated_song_folder, "bass.wav"))
+    # os.removedirs(separated_song_folder)
+
 
     # fit tracks vertically
     pa.do("FitV:")
 
 if questions.get("model"):
-    model_name = questions.get("model",{}).get("name", "")
+    model_name = questions.get("model")
     if questions.get("separate", False) is True:
         # Mute original track
         select_track("0")
         pa.mute_tracks()
+        print("QUESTIONS", questions)
+        utils.change_voice(os.path.join(separated_song_folder, "vocals.wav"), id, str(questions.get("pitch", 0)), questions["model"])
 
-        commands = [python, os.path.join(os.getcwd(), "rvc", "cli.py"), "--input_audio", os.path.join(path, "vocals.mp3"), "--speaker_id", "0", "--f0_method", "crepe", "--crepe_hop_length", "1", "--f0_up_key", str(questions.get("pitch", 0)), "--output_path", os.path.join(path, "ai_generated.wav"), "--model_path", questions["model"]["pth"], "--file_index", questions["model"]["index"]]
-        list_files = subprocess.run(commands)
-
-        print("The exit code was: %d" % list_files.returncode)
-        print(list_files)
-        import_audio(os.path.join(path, "ai_generated.wav"), f"voix_ai_{model_name}-{id_short}")
+        import_audio(os.path.join(utils.TEMP_FOLDER, id, "aivoice.wav"), f"voix_ai_{model_name}-{id}")
         pa.do("Align_StartToSelStart:")
 
         # fit tracks vertically
