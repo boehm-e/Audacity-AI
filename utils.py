@@ -6,7 +6,7 @@ from pprint import pprint
 import inquirer
 import requests
 
-SERVER_URL = "http://localhost:8000"
+SERVER_URL = "http://192.168.111.131:8000"
 TEMP_FOLDER = os.path.join(os.getcwd(), "temp_files")
 
 def get_models_from_api():
