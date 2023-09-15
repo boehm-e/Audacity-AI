@@ -31,6 +31,11 @@ Downlaod [hubert_base.pt](https://huggingface.co/lj1995/VoiceConversionWebUI/res
 pip install -r requirements.txt
 ```
 
+## Adding voice models
+1. Voice models should be inside the `models/` folder
+2. Each voice model consists of a Folder, which will be used as the name of the model.
+3. Each voice model folder should contain a `.pth` and `.index` file
+
 ## Usage
 1. Import an audio clip into Audacity (It must be the first clip).
 2. Select the audio range you want to edit
