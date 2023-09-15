@@ -13,7 +13,7 @@ from utils import TEMP_FOLDER, mkdir
 
 app = FastAPI()
 
-python = "/home/erwan/anaconda3/envs/ai_perso/bin/python"
+python = "python"
 
 class Item(BaseModel):
     action: str
@@ -121,7 +121,7 @@ async def change_voice(id: str = Form(...), pitch: str = Form(...), voice: str =
         "--f0_method",
         "crepe",
         "--crepe_hop_length",
-        "2",
+        "1",
         "--f0_up_key",
         pitch or 0,
         "--output_path", 

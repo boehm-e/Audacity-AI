@@ -6,7 +6,8 @@ from pprint import pprint
 import inquirer
 import requests
 
-SERVER_URL = "http://192.168.111.131:8000"
+# SERVER_URL = "http://192.168.111.131:8000"
+SERVER_URL = "http://localhost:8000"
 TEMP_FOLDER = os.path.join(os.getcwd(), "temp_files")
 
 def get_models_from_api():
@@ -19,11 +20,9 @@ def mkdir(path: str):
     try:
         os.makedirs(path)
     except FileExistsError:
-        print(f"dir {path} already exists")
         pass
 
 def separate_tracks(file_path, id):
-    print("FILE PATH", file_path, id)
     url = f"{SERVER_URL}/separate_tracks"
     headers = {
         "accept": "application/json"
@@ -43,7 +42,6 @@ def separate_tracks(file_path, id):
         extract_path = os.path.join(TEMP_FOLDER, id)
         mkdir(extract_path)
         zip_path = os.path.join(extract_path, f"{id}.zip")
-        print("separate_tracks zip_path", zip_path)
         # Save the ZIP content to a file
         with open(zip_path, "wb") as f:
             f.write(response.content)
@@ -57,7 +55,6 @@ def separate_tracks(file_path, id):
 
 
 def change_voice(file_path, id, pitch, voice):
-    print("change_voice", file_path, id, pitch, voice)
     url = f"{SERVER_URL}/change_voice"
     headers = {
         "accept": "application/json"
@@ -79,7 +76,6 @@ def change_voice(file_path, id, pitch, voice):
         extract_path = os.path.join(TEMP_FOLDER, id)
         mkdir(extract_path)
         zip_path = os.path.join(extract_path, f"{id}.zip")
-        print("separate_tracks zip_path", zip_path)
         # Save the ZIP content to a file
         with open(zip_path, "wb") as f:
             f.write(response.content)
@@ -93,33 +89,53 @@ def change_voice(file_path, id, pitch, voice):
 
 
 
+lang = "en"
+texts = {
+    "fr": {
+        "yes": "oui",
+        "no": "non",
+        "q1": "Séparer la voix et les instruments",
+        "q2": "Changer la voix",
+        "q3": "Quelle voix ?",
+        "q4": "Modifier le pitch de la voix ?\n Femme -> Homme ~= -6\n Homme -> Femme ~= 6 |  "
+    },
+    "en": {
+        "yes": "yes",
+        "no": "no",
+        "q1": "Separate voice and instruments",
+        "q2": "Change the voice",
+        "q3": "Which voice?",
+        "q4": "Change the pitch of the voice?\n Female -> Male ~= -6\n Male -> Female ~= 6 |  "
+    }
+}
+
 def get_answers():
     models = get_models_from_api()
     questions = [
         inquirer.List(
             "separate",
-            message="Séparer la voix et les instruments",
-            choices=["oui", "non"],
+            message=texts[lang]["q1"],
+            choices=[texts[lang]["yes"], texts[lang]["no"]],
             default="oui",
             carousel=True
         ),
         inquirer.List(
             "voice_cover",
-            message="Changer la voix",
-            choices=["oui", "non"],
+            message=texts[lang]["q2"],
+            choices=[texts[lang]["yes"], texts[lang]["no"]],
             default="oui",
             carousel=True
         ),
         inquirer.List(
             "model",
-            message="Quelle voix ?",
+            message=texts[lang]["q3"],
             ignore=lambda a: a["voice_cover"] == "non",
             choices=models,
             carousel=True
         ),
         inquirer.List(
             "pitch",
-            message="Modifier le pitch de la voix ?\n Femme -> Homme ~= -6\n Homme -> Femme ~= 6 |  ",
+            message=texts[lang]["q4"],
             ignore=lambda a: a["voice_cover"] == "non",
             choices=["-12", " -9", " -6", "  0", "  6", "  9", " 12"],
             default="  0",
@@ -128,9 +144,9 @@ def get_answers():
     ]
     res = {}
     answers = inquirer.prompt(questions)
-    if (answers["separate"] == "oui"):
+    if (answers["separate"] == texts[lang]["yes"]):
         res["separate"] = True
-    if (answers["voice_cover"] == "oui"):
+    if (answers["voice_cover"] == texts[lang]["yes"]):
         model = [model for model in models if model == answers["model"]]
         res["model"] = model.pop()
         res["pitch"] = int(answers["pitch"])
