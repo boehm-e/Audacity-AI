@@ -36,7 +36,7 @@ pip install -r requirements.txt
 2. Select the audio range you want to edit
 3. Start the server by running the following command : `python server.py` 
 4. Start the client by running the following command : `python index.py`
-5. Answer the questions 
+5. The `index.py` file will guide you through the process.
 
 # Offloading the computation to another computer (server,...)
 
