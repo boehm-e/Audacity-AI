@@ -31,6 +31,10 @@ Downlaod [hubert_base.pt](https://huggingface.co/lj1995/VoiceConversionWebUI/res
 pip install -r requirements.txt
 ```
 
+**mod-script-pipe** : This script will communicate with Audacity using mod-script-pipe. So you need to enable it. To do that:
+1. Open Audacity's preferences (`ctrl+P` or `Edit --> Preferences`)
+2. In Modules tab, select `Enabled` for `mod-script-pipe`
+
 ## Adding voice models
 1. Voice models should be inside the `models/` folder
 2. Each voice model consists of a Folder, which will be used as the name of the model.
