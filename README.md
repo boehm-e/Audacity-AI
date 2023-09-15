@@ -14,14 +14,6 @@ The project seamlessly interfaces with Audacity using [mod-script-pipe](https://
 ## Demo
 ![](./demo.gif)
 
-## Decoupled Processing
-
-I've chosen to separate the processing part of the project from the Audacity communication into two distinct scripts for practical reasons. By doing this, it allows us to:
-
-1. Optimize Resource Usage: I can run the processing server on a high-performance machine equipped with a GPU, ensuring efficient and speedy voice separation and conversion tasks.
-
-2. Decouple Audacity Work: Simultaneously, Audacity can be run on a less powerful machine since it primarily handles communication tasks. This separation of responsibilities enables us to utilize resources more effectively, ensuring that both the audio editing and processing tasks can be performed efficiently.
-
 
 ## Installation
 
@@ -46,6 +38,15 @@ pip install -r requirements.txt
 3. Start the server by running the following command : `python server.py` 
 4. Start the client by running the following command : `python index.py`
 5. The `index.py` file will guide you through the process.
+
+
+## Decoupled Processing
+
+I've chosen to separate the processing part of the project from the Audacity communication into two distinct scripts for practical reasons. By doing this, it allows us to:
+
+1. Optimize Resource Usage: I can run the processing server on a high-performance machine equipped with a GPU, ensuring efficient and speedy voice separation and conversion tasks.
+
+2. Decouple Audacity Work: Simultaneously, Audacity can be run on a less powerful machine since it primarily handles communication tasks. This separation of responsibilities enables us to utilize resources more effectively, ensuring that both the audio editing and processing tasks can be performed efficiently.
 
 # Offloading the computation to another computer (server,...)
 
